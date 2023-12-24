@@ -3,7 +3,7 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
-using PremiumAccess.Web.Data;
+using PremiumAccess.Infrastructure;
 using System;
 
 namespace PremiumAccess.Web.Data.Migrations

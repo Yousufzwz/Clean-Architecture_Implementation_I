@@ -1,6 +1,6 @@
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
-using PremiumAccess.Web.Data;
+using PremiumAccess.Infrastructure;
 
 var builder = WebApplication.CreateBuilder(args);
 
