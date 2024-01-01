@@ -11,7 +11,7 @@ namespace PremiumAccess.Infrastructure.Repositories;
 
 public class ContentRepository : Repository<Content, Guid>, IContentRepository
 {
-    public ContentRepository(DbContext context) : base(context)
+    public ContentRepository(IApplicationDbContext context) : base((DbContext)context)
     {
     }
 }
