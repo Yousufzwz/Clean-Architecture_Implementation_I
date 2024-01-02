@@ -1,5 +1,6 @@
 ﻿using Autofac;
 using Microsoft.AspNetCore.Mvc;
+using PremiumAccess.Infrastructure;
 using PremiumAccess.Web.Areas.Admin.Models;
 
 
@@ -48,6 +49,17 @@ namespace PremiumAccess.Web.Areas.Admin.Controllers
             }
             return View(model);
         }
+
+
+        public async Task<JsonResult> GetContents()
+        {
+            var dataTablesModel = new DataTablesAjaxRequestUtility(Request);
+            var model = _scope.Resolve<ContentListModel>();
+
+            var data = await model.GetPagedContentsAsync(dataTablesModel);
+            return Json(data);
+        }
+
 
     }
 

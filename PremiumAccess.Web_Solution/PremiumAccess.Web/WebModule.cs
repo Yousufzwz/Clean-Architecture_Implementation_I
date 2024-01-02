@@ -8,6 +8,6 @@ public class WebModule : Module
     protected override void Load(ContainerBuilder builder)
     {
         builder.RegisterType<ContentCreateModel>().AsSelf();
-      //  builder.RegisterType<ContentListModel>().AsSelf();
+        builder.RegisterType<ContentListModel>().AsSelf();
     }
 }

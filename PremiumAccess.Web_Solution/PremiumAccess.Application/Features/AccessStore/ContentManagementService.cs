@@ -18,6 +18,12 @@ public class ContentManagementService : IContentManagementService
 
     public async Task CreateContentAsync(string title, string category, uint duration)
     {
+        bool isDuplicateTitle = await _unitOfWork.ContentRepository.
+           IsTitleDuplicateAsync(title);
+
+        if (isDuplicateTitle)
+            throw new InvalidOperationException();
+
         Content content = new Content
         {
             Title = title,
@@ -32,5 +38,11 @@ public class ContentManagementService : IContentManagementService
     public Task CreateContentAsync(string title, uint duration, string category)
     {
         throw new NotImplementedException();
+    }
+
+    public async Task<(IList<Content> records, int total, int totalDisplay)> GetPagedContentsAsync(int pageIndex, int pageSize, string searchText, string sortBy)
+    {
+        return await _unitOfWork.ContentRepository.GetTableDataAsync(searchText, sortBy,
+            pageIndex, pageSize);
     }
 }
