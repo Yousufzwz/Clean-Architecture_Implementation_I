@@ -1,5 +1,6 @@
 ﻿using Autofac;
 using Microsoft.AspNetCore.Mvc;
+using PremiumAccess.Domain.Exceptions;
 using PremiumAccess.Infrastructure;
 using PremiumAccess.Web.Areas.Admin.Models;
 
@@ -40,11 +41,31 @@ namespace PremiumAccess.Web.Areas.Admin.Controllers
                 {
                     model.Resolve(_scope);
                     await model.CreateContentAsync();
+                    TempData.Put("ResponseMessage", new ResponseModel
+                    {
+                        Message = "Content created successfuly",
+                        Type = ResponseTypes.Success
+                    });
+
                     return RedirectToAction("Index");
                 }
-                catch (Exception ex)
+                catch (DuplicateTitleException de)
                 {
-                    _logger.LogError(ex, "Failed to create content");
+                    TempData.Put("ResponseMessage", new ResponseModel
+                    {
+                        Message = de.Message,
+                        Type = ResponseTypes.Danger
+                    });
+                }
+                catch (Exception e)
+                {
+                    _logger.LogError(e, "Server Error");
+
+                    TempData.Put("ResponseMessage", new ResponseModel
+                    {
+                        Message = "There was a problem in creating content",
+                        Type = ResponseTypes.Danger
+                    });
                 }
             }
             return View(model);
@@ -58,6 +79,80 @@ namespace PremiumAccess.Web.Areas.Admin.Controllers
 
             var data = await model.GetPagedContentsAsync(dataTablesModel);
             return Json(data);
+        }
+
+
+
+        public async Task<IActionResult> Update(Guid id)
+        {
+            var model = _scope.Resolve<ContentUpdateModel>();
+            await model.LoadAsync(id);
+            return View(model);
+        }
+
+        [HttpPost, ValidateAntiForgeryToken]
+        public async Task<IActionResult> Update(ContentUpdateModel model)
+        {
+            model.Resolve(_scope);
+
+            if (ModelState.IsValid)
+            {
+                try
+                {
+                    await model.UpdateContentAsync();
+                    return RedirectToAction("Index");
+                }
+                catch (DuplicateTitleException de)
+                {
+                    TempData.Put("ResponseMessage", new ResponseModel
+                    {
+                        Message = de.Message,
+                        Type = ResponseTypes.Danger
+                    });
+                }
+                catch (Exception e)
+                {
+                    _logger.LogError(e, "Server Error");
+                    TempData.Put("ResponseMessage", new ResponseModel
+                    {
+                        Message = "There was a problem in updating content",
+                        Type = ResponseTypes.Danger
+                    });
+                }
+            }
+
+            return View(model);
+        }
+
+        [HttpPost, ValidateAntiForgeryToken]
+        public async Task<IActionResult> Delete(Guid id)
+        {
+            var model = _scope.Resolve<ContentListModel>();
+
+            if (ModelState.IsValid)
+            {
+                try
+                {
+                    await model.DeleteContentAsync(id); TempData.Put("ResponseMessage", new ResponseModel
+                    {
+                        Message = "Content deleted successfuly",
+                        Type = ResponseTypes.Success
+                    });
+
+                    return RedirectToAction("Index");
+                }
+                catch (Exception e)
+                {
+                    _logger.LogError(e, "Server Error");
+
+                    TempData.Put("ResponseMessage", new ResponseModel
+                    {
+                        Message = "There was a problem in deleting content",
+                        Type = ResponseTypes.Danger
+                    });
+                }
+        }
+            return RedirectToAction("Index");
         }
 
 

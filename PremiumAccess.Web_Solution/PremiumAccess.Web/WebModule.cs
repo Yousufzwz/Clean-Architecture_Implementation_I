@@ -9,5 +9,6 @@ public class WebModule : Module
     {
         builder.RegisterType<ContentCreateModel>().AsSelf();
         builder.RegisterType<ContentListModel>().AsSelf();
+        builder.RegisterType<ContentUpdateModel>().AsSelf();
     }
 }

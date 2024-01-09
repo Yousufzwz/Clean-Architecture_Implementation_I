@@ -4,7 +4,7 @@ using System.Text;
 
 namespace PremiumAccess.Domain;
 
-public interface IUnitOfWork : IDisposable
+public interface IUnitOfWork : IDisposable, IAsyncDisposable
 {
     Task SaveAsync();
 }

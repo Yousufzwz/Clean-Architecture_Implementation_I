@@ -1,4 +1,5 @@
 ﻿using PremiumAccess.Domain.Entities;
+using PremiumAccess.Domain.Exceptions;
 using PremiumAccess.Domain.Features.AccessStore;
 using System;
 using System.Collections.Generic;
@@ -22,7 +23,7 @@ public class ContentManagementService : IContentManagementService
            IsTitleDuplicateAsync(title);
 
         if (isDuplicateTitle)
-            throw new InvalidOperationException();
+            throw new DuplicateTitleException();
 
         Content content = new Content
         {
@@ -35,10 +36,37 @@ public class ContentManagementService : IContentManagementService
         await _unitOfWork.SaveAsync();
     }
 
-    public Task CreateContentAsync(string title, uint duration, string category)
+
+    public async Task DeleteContentAsync(Guid id)
     {
-        throw new NotImplementedException();
+        await _unitOfWork.ContentRepository.RemoveAsync(id);
+        await _unitOfWork.SaveAsync();
     }
+
+    public async Task<Content> GetContentAsync(Guid id)
+    {
+        return await _unitOfWork.ContentRepository.GetByIdAsync(id);
+    }
+
+    public async Task UpdateContentAsync(Guid id, string title, string category,
+           uint duration)
+    {
+        bool isDuplicatTitle = await _unitOfWork.ContentRepository.
+                IsTitleDuplicateAsync(title, id);
+
+        if (isDuplicatTitle)
+            throw new DuplicateTitleException();
+
+        var course = await GetContentAsync(id);
+        if (course is not null)
+        {
+            course.Title = title;
+            course.Category = category;
+            course.Duration = duration;
+        }
+        await _unitOfWork.SaveAsync();
+    }
+
 
     public async Task<(IList<Content> records, int total, int totalDisplay)> GetPagedContentsAsync(int pageIndex, int pageSize, string searchText, string sortBy)
     {

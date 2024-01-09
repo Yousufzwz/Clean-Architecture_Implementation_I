@@ -6,20 +6,20 @@ namespace PremiumAccess.Web.Areas.Admin.Models;
 
 public class ContentListModel
 {
-    private readonly IContentManagementService _contentService;
+    private IContentManagementService _contentManagementService;
 
     public ContentListModel()
     {
     }
 
-    public ContentListModel(IContentManagementService contentService)
+    public ContentListModel(IContentManagementService contentManagementService)
     {
-        _contentService = contentService;
+        _contentManagementService = contentManagementService;
     }
 
     public async Task<object> GetPagedContentsAsync(DataTablesAjaxRequestUtility dataTablesUtility)
     {
-        var data = await _contentService.GetPagedContentsAsync(
+        var data = await _contentManagementService.GetPagedContentsAsync(
             dataTablesUtility.PageIndex,
             dataTablesUtility.PageSize,
             dataTablesUtility.SearchText,
@@ -41,4 +41,8 @@ public class ContentListModel
         };
     }
 
+    internal async Task DeleteContentAsync(Guid id)
+    {
+        await _contentManagementService.DeleteContentAsync(id);
+    }
 }
